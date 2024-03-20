@@ -74,57 +74,53 @@ def signup_page(root):
     signup_label = tk.Label(signup_frame, text="Create an Account", font=("Segoe UI", 30, "bold"))  
     signup_label.grid(row=0, column=0, columnspan=2, pady=30)
 
-    # * indicates required field
-    required_label = tk.Label(signup_frame, text="* Indicates required field", font=("Segoe UI", 10))  
-    required_label.grid(row=1, column=0, padx=20, pady=(0,10))
-
     # Personal Information
     personal_info_label = tk.Label(signup_frame, text="Personal Information", font=("Segoe UI", 15, "bold")) 
-    personal_info_label.grid(row=2, column=0, columnspan=2, sticky="w", padx=20, pady=(0,10))
+    personal_info_label.grid(row=1, column=0, columnspan=2, sticky="w", padx=20, pady=(0,10))
 
     # First Name
     first_name_label = tk.Label(signup_frame, text="First Name:", font=("Segoe UI", 10))
-    first_name_label.grid(row=3, column=0, sticky="w", padx=20)
+    first_name_label.grid(row=2, column=0, sticky="w", padx=20)
     first_name_entry = ctk.CTkEntry(signup_frame)
-    first_name_entry.grid(row=3, column=1, sticky="w", padx=(0, 20))
+    first_name_entry.grid(row=2, column=1, sticky="w", padx=(0, 20))
 
     # Last Name
     last_name_label = tk.Label(signup_frame, text="Last Name:", font=("Segoe UI", 10))
-    last_name_label.grid(row=4, column=0, sticky="w", padx=20)
+    last_name_label.grid(row=3, column=0, sticky="w", padx=20)
     last_name_entry = ctk.CTkEntry(signup_frame) 
-    last_name_entry.grid(row=4, column=1, sticky="w", padx=(0, 20))
+    last_name_entry.grid(row=3, column=1, sticky="w", padx=(0, 20))
 
     # Email
     email_label = tk.Label(signup_frame, text="Email:", font=("Segoe UI", 10))
-    email_label.grid(row=5, column=0, sticky="w", padx=20)
+    email_label.grid(row=4, column=0, sticky="w", padx=20)
     email_entry = ctk.CTkEntry(signup_frame) 
-    email_entry.grid(row=5, column=1, sticky="w", padx=(0, 20))
+    email_entry.grid(row=4, column=1, sticky="w", padx=(0, 20))
 
     # Mobile Number
     mobile_label = tk.Label(signup_frame, text="Mobile Number:", font=("Segoe UI", 10))
-    mobile_label.grid(row=6, column=0, sticky="w", padx=20)
+    mobile_label.grid(row=5, column=0, sticky="w", padx=20)
     mobile_entry = ctk.CTkEntry(signup_frame) 
-    mobile_entry.grid(row=6, column=1, sticky="w", padx=(0, 20))
+    mobile_entry.grid(row=5, column=1, sticky="w", padx=(0, 20))
 
     # Account Security
     account_security_label = tk.Label(signup_frame, text="Account Security", font=("Segoe UI", 15, "bold")) 
-    account_security_label.grid(row=7, column=0, columnspan=2, sticky="w", padx=20, pady=(20,10))
+    account_security_label.grid(row=6, column=0, columnspan=2, sticky="w", padx=20, pady=(20,10))
 
     # Username
     username_label = tk.Label(signup_frame, text="Username:", font=("Segoe UI", 10))
-    username_label.grid(row=8, column=0, sticky="w", padx=20)
+    username_label.grid(row=7, column=0, sticky="w", padx=20)
     username_entry = ctk.CTkEntry(signup_frame) 
-    username_entry.grid(row=8, column=1, sticky="w", padx=(0, 20))
+    username_entry.grid(row=7, column=1, sticky="w", padx=(0, 20))
 
     # Password
     password_label = tk.Label(signup_frame, text="Password:", font=("Segoe UI", 10))
-    password_label.grid(row=9, column=0, sticky="w", padx=20)
+    password_label.grid(row=8, column=0, sticky="w", padx=20)
     password_entry = ctk.CTkEntry(signup_frame, show="*")  
-    password_entry.grid(row=9, column=1, sticky="w", padx=(0, 20))
+    password_entry.grid(row=8, column=1, sticky="w", padx=(0, 20))
 
     # go to login
     goto_login = tk.Label(signup_frame, text="I already have an account", font=("Segoe UI", 10), fg="#00754A", cursor="hand2")
-    goto_login.grid(row=10, column=0, columnspan=2, pady=20)
+    goto_login.grid(row=9, column=0, columnspan=2, pady=20)
     goto_login.bind("<Button-1>", lambda event: login_page(root))
 
     submit_button = ctk.CTkButton(signup_frame, text="Create Account",
@@ -132,7 +128,7 @@ def signup_page(root):
                                   font=("Montserrat", 13), width=120, height=30,
                                   command=lambda: submit_signup_form(root, first_name_entry.get(), last_name_entry.get(), email_entry.get(),mobile_entry.get(), username_entry.get(),password_entry.get()))
     
-    submit_button.grid(row=11, column=0, columnspan=2)
+    submit_button.grid(row=10, column=0, columnspan=2)
 
 
 # SIGN UP VALIDATION
@@ -158,25 +154,21 @@ def login_page(root):
     login_label = tk.Label(login_frame, text="Sign in to Account", font=("Segoe UI", 30, "bold"))  
     login_label.grid(row=0, column=0, columnspan=2, pady=30)
 
-    
-    required_label = tk.Label(login_frame, text="* Indicates required field", font=("Segoe UI", 10))  
-    required_label.grid(row=1, column=0, padx=20, pady=(0,10))
-
     # Username
     username_label = tk.Label(login_frame, text="Username:", font=("Segoe UI", 10))
-    username_label.grid(row=2, column=0, sticky="w", padx=20)
+    username_label.grid(row=1, column=0, sticky="w", padx=20)
     username_entry = ctk.CTkEntry(login_frame) 
-    username_entry.grid(row=2, column=1, sticky="w", padx=(0, 20))
+    username_entry.grid(row=1, column=1, sticky="w", padx=(0, 20))
 
     # Password
     password_label = tk.Label(login_frame, text="Password:", font=("Segoe UI", 10))
-    password_label.grid(row=3, column=0, sticky="w", padx=20)
+    password_label.grid(row=2, column=0, sticky="w", padx=20)
     password_entry = ctk.CTkEntry(login_frame, show="*")  
-    password_entry.grid(row=3, column=1, sticky="w", padx=(0, 20))
+    password_entry.grid(row=2, column=1, sticky="w", padx=(0, 20))
 
     # go to login
     goto_signup = tk.Label(login_frame, text="Don't have any account?", font=("Segoe UI", 10), fg="#00754A", cursor="hand2")
-    goto_signup.grid(row=4, column=0, columnspan=2, pady=20)
+    goto_signup.grid(row=3, column=0, columnspan=2, pady=20)
     goto_signup.bind("<Button-1>", lambda event: signup_page(root))
 
     # Login Button
@@ -184,7 +176,7 @@ def login_page(root):
                                   corner_radius=50, fg_color="#00754A",
                                   font=("Montserrat", 13), width=120, height=30,
                                   command = lambda:login(username_entry.get(), password_entry.get()))
-    login_button.grid(row=5, column=0, columnspan=2)
+    login_button.grid(row=4, column=0, columnspan=2)
 
 # LOGIN VALIDATION
 def login(username, password):
