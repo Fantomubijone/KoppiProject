@@ -4,7 +4,8 @@ class DB:
     def __init__(self, db_name):
         self.conn = sqlite3.connect(db_name)
         self.c = self.conn.cursor()
-        self.create_accounts_table()  # Create Accounts table if it doesn't exist
+        self.create_accounts_table()
+        
 
     def create_accounts_table(self):
         self.c.execute('''CREATE TABLE IF NOT EXISTS Accounts (
@@ -18,15 +19,17 @@ class DB:
                         )''')
         self.conn.commit()
 
+
     def insert_into_accounts(self, first_name, last_name, email, mobile_number, username, password):
         self.c.execute('''INSERT INTO Accounts (first_name, last_name, email, mobile_number, username, password)
                             VALUES (?, ?, ?, ?, ?, ?)''', (first_name, last_name, email, mobile_number, username, password))
         self.conn.commit()
 
+
     def validate_login(self, username, password):
         self.c.execute('''SELECT * FROM Accounts WHERE username=? AND password=?''', (username, password))
-        result = self.c.fetchone()  # Fetch the first matching row
+        result = self.c.fetchone() 
         if result:
-            return True  # Login successful if the user exists with the provided credentials
+            return True
         else:
-            return False  # Login failed if no matching user found with the provided credentials
+            return False

@@ -4,7 +4,7 @@ from tkinter import messagebox
 from PIL import Image
 import customtkinter as ctk
 from customtkinter import *
-from database import DB  # Import the DB class
+from database import DB 
 
 
 def clear():
@@ -71,55 +71,55 @@ def signup_page(root):
     signup_frame = Frame(root)
     signup_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-    signup_label = tk.Label(signup_frame, text="Create an Account", font=("Segoe UI", 30, "bold"))  # Modern font and color
+    signup_label = tk.Label(signup_frame, text="Create an Account", font=("Segoe UI", 30, "bold"))  
     signup_label.grid(row=0, column=0, columnspan=2, pady=30)
 
     # * indicates required field
-    required_label = tk.Label(signup_frame, text="* Indicates required field", font=("Segoe UI", 10))  # Gray color for hint
+    required_label = tk.Label(signup_frame, text="* Indicates required field", font=("Segoe UI", 10))  
     required_label.grid(row=1, column=0, padx=20, pady=(0,10))
 
     # Personal Information
-    personal_info_label = tk.Label(signup_frame, text="Personal Information", font=("Segoe UI", 15, "bold"))  # Color adjustment
+    personal_info_label = tk.Label(signup_frame, text="Personal Information", font=("Segoe UI", 15, "bold")) 
     personal_info_label.grid(row=2, column=0, columnspan=2, sticky="w", padx=20, pady=(0,10))
 
     # First Name
-    first_name_label = tk.Label(signup_frame, text="First Name:", font=("Segoe UI", 10))
+    first_name_label = tk.Label(signup_frame, text="First Name:", font=("Segoe UI", 13))
     first_name_label.grid(row=3, column=0, sticky="w", padx=20)
-    first_name_entry = ctk.CTkEntry(signup_frame, placeholder_text ="First Name")
+    first_name_entry = ctk.CTkEntry(signup_frame)
     first_name_entry.grid(row=3, column=1, sticky="w", padx=(0, 20))
 
     # Last Name
     last_name_label = tk.Label(signup_frame, text="Last Name:", font=("Segoe UI", 10))
     last_name_label.grid(row=4, column=0, sticky="w", padx=20)
-    last_name_entry = ctk.CTkEntry(signup_frame)  # Border adjustment
+    last_name_entry = ctk.CTkEntry(signup_frame) 
     last_name_entry.grid(row=4, column=1, sticky="w", padx=(0, 20))
 
     # Email
     email_label = tk.Label(signup_frame, text="Email:", font=("Segoe UI", 10))
     email_label.grid(row=5, column=0, sticky="w", padx=20)
-    email_entry = ctk.CTkEntry(signup_frame)  # Border adjustment
+    email_entry = ctk.CTkEntry(signup_frame) 
     email_entry.grid(row=5, column=1, sticky="w", padx=(0, 20))
 
     # Mobile Number
     mobile_label = tk.Label(signup_frame, text="Mobile Number:", font=("Segoe UI", 10))
     mobile_label.grid(row=6, column=0, sticky="w", padx=20)
-    mobile_entry = ctk.CTkEntry(signup_frame)  # Border adjustment
+    mobile_entry = ctk.CTkEntry(signup_frame) 
     mobile_entry.grid(row=6, column=1, sticky="w", padx=(0, 20))
 
     # Account Security
-    account_security_label = tk.Label(signup_frame, text="Account Security", font=("Segoe UI", 15, "bold"))  # Color adjustment
+    account_security_label = tk.Label(signup_frame, text="Account Security", font=("Segoe UI", 15, "bold")) 
     account_security_label.grid(row=7, column=0, columnspan=2, sticky="w", padx=20, pady=(20,10))
 
     # Username
     username_label = tk.Label(signup_frame, text="Username:", font=("Segoe UI", 10))
     username_label.grid(row=8, column=0, sticky="w", padx=20)
-    username_entry = ctk.CTkEntry(signup_frame)  # Border adjustment
+    username_entry = ctk.CTkEntry(signup_frame) 
     username_entry.grid(row=8, column=1, sticky="w", padx=(0, 20))
 
     # Password
     password_label = tk.Label(signup_frame, text="Password:", font=("Segoe UI", 10))
     password_label.grid(row=9, column=0, sticky="w", padx=20)
-    password_entry = ctk.CTkEntry(signup_frame, show="*")  # Border adjustment and password masking
+    password_entry = ctk.CTkEntry(signup_frame, show="*")  
     password_entry.grid(row=9, column=1, sticky="w", padx=(0, 20))
 
     # go to login
@@ -158,23 +158,23 @@ def login_page(root):
     login_frame = Frame(root)
     login_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-    login_label = tk.Label(login_frame, text="Sign in to your account", font=("Segoe UI", 30, "bold"))  # Modern font and color
+    login_label = tk.Label(login_frame, text="Sign in to your account", font=("Segoe UI", 30, "bold"))  
     login_label.grid(row=0, column=0, columnspan=2, pady=30)
 
     # * indicates required field
-    required_label = tk.Label(login_frame, text="* Indicates required field", font=("Segoe UI", 10))  # Gray color for hint
+    required_label = tk.Label(login_frame, text="* Indicates required field", font=("Segoe UI", 10))  
     required_label.grid(row=1, column=0, columnspan=2, pady=(0,10))
 
     # Username
     username_label = tk.Label(login_frame, text="Username:", font=("Segoe UI", 10))
     username_label.grid(row=2, column=0, sticky="w", padx=20)
-    username_entry = ctk.CTkEntry(login_frame)  # Border adjustment
+    username_entry = ctk.CTkEntry(login_frame) 
     username_entry.grid(row=2, column=1, sticky="w", padx=(0, 20))
 
     # Password
     password_label = tk.Label(login_frame, text="Password:", font=("Segoe UI", 10))
     password_label.grid(row=3, column=0, sticky="w", padx=20)
-    password_entry = ctk.CTkEntry(login_frame, show="*")  # Border adjustment and password masking
+    password_entry = ctk.CTkEntry(login_frame, show="*")  
     password_entry.grid(row=3, column=1, sticky="w", padx=(0, 20), pady=(0, 20))
 
     # go to login
@@ -200,7 +200,28 @@ def login(username, password):
         messagebox.showerror("Error", "Invalid username or password.")
 
 def buy(root):
-    pass
+    clear()
+    category_frame = Frame(root)
+    category_frame.pack(pady=20)
+
+    def select_category(category):
+        clear()
+        print("Selected Category:", category)
+
+    drinks_button = Button(category_frame, text="Drinks", font=("Helvetica", 16),
+                           command=lambda: select_category("Drinks"))
+    drinks_button.grid(row=0, column=0, padx=10)
+
+    pastries_button = Button(category_frame, text="Pastries", font=("Helvetica", 16),
+                             command=lambda: select_category("Pastries"))
+    pastries_button.grid(row=0, column=1, padx=10)
+
+    pasta_button = Button(category_frame, text="Pasta", font=("Helvetica", 16),
+                          command=lambda: select_category("Pasta"))
+    pasta_button.grid(row=0, column=2, padx=10)
+
+    selected_category_label = Label(root, text="Please select a category", font=("Helvetica", 20))
+    selected_category_label.pack(pady=50)
 
 # MAIN 
 if __name__ == "__main__":
