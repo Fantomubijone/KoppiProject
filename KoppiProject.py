@@ -130,25 +130,22 @@ def signup_page(root):
     submit_button = ctk.CTkButton(signup_frame, text="Create Account",
                                   corner_radius=50, fg_color="#00754A",
                                   font=("Montserrat", 10), width=120, height=30,
-                                  command=lambda: submit_signup_form(root, first_name_entry.get(),
-                                                                     last_name_entry.get(), email_entry.get(),
-                                                                     mobile_entry.get(), username_entry.get(),
-                                                                     password_entry.get()))
+                                  command=lambda: submit_signup_form(root, first_name_entry.get(), last_name_entry.get(), email_entry.get(),mobile_entry.get(), username_entry.get(),password_entry.get()))
+    
     submit_button.grid(row=11, column=0, columnspan=2, pady=(10, 0))
 
 
 # SIGN UP VALIDATION
-def submit_signup_form(root, first_name, last_name, email, mobile_number, username, password):
-    if not all([first_name, last_name, email, mobile_number, username, password]):
+def submit_signup_form(root, fname, lname, email, mobilenum, uname, passw):
+    if not all([fname, lname, email, mobilenum, uname, passw]):
         messagebox.showerror("Error", "Please fill in all the fields.")
         return  
     
-    db = DB("KoppiProject.db")  # Pass the database name when creating an instance of DB
-    db.insert_into_accounts(first_name, last_name, email, mobile_number, username, password)
+    db = DB("KoppiProject.db")  # Accesing the database file
+    db.insert_into_accounts(fname, lname, email, mobilenum, uname, passw)
 
-    # After inserting data into the database, you can perform any necessary actions
     messagebox.showinfo("Success", "Sign up successful!")
-    homepage(root)  # Go back to the homepage
+    login(root)
 
 
 # LOGIN PAGE
