@@ -37,8 +37,12 @@ def logo(root):
 
 # CHECKOUT BUTTON
 def checkout(root):
-    checkout_button = Button(root, text="Checkout", command = lambda:homepage(root))
+    checkout_button = ctk.CTkButton(root, text="Checkout",
+                                  corner_radius=50, fg_color="#00754A",
+                                  font=("Montserrat", 13), width=120, height=30,
+                                       command=lambda: buy(root))
     checkout_button.place(relx=0.9, rely=0.9, anchor=SE)
+
 
 # STARTING PAGE
 def homepage(root):
