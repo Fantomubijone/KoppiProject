@@ -134,3 +134,7 @@ class DB:
     def delete_orders(self): # To reset order
         self.c.execute('''DELETE FROM Orders''')
         self.conn.commit()
+
+    def delete_order(self, order_id):
+        self.c.execute('''DELETE FROM Orders WHERE id=?''', (order_id,))
+        self.conn.commit()

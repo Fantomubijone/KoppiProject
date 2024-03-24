@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
 from PIL import Image
 import customtkinter as ctk
 from customtkinter import *
@@ -40,9 +41,63 @@ def checkout(root):
     checkout_button = ctk.CTkButton(root, text="Checkout",
                                   corner_radius=50, fg_color="#00754A",
                                   font=("Montserrat", 13), width=120, height=30,
-                                       command=lambda: buy(root))
+                                       command=lambda: checkouts(root))
     checkout_button.place(relx=0.9, rely=0.9, anchor=SE)
 
+def checkouts(root):
+    clear()
+
+    # Create treeview widget
+    tree = ttk.Treeview(root)
+    tree['columns'] = ('Item Name', 'Price', 'Quantity')
+
+    # Define column headings
+    tree.heading('#0', text='ID')
+    tree.heading('Item Name', text='Item Name')
+    tree.heading('Price', text='Price')
+    tree.heading('Quantity', text='Quantity')
+
+    # Fetch data from the Orders table
+    db.c.execute('''SELECT * FROM Orders''')
+    orders = db.c.fetchall()
+
+    # Insert data into the tree
+    for order in orders:
+        tree.insert('', 'end', text=order[0], values=(order[1], order[2], order[3]))
+
+    # Place the tree on the root window
+    tree.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+    # Add buttons for various actions
+    create_button(root, "Pay now", lambda: payment(tree), 0.7, 0.9)
+    create_button(root, "Add More Order", lambda: buy(root), 0.5, 0.9)
+    create_button(root, "Delete Order", lambda: delete_order(tree), 0.3, 0.9)
+    create_button(root, "Delete All Orders", delete_all_orders, 0.1, 0.9)
+
+def create_button(root, text, command, relx, rely):
+    button = ctk.CTkButton(root, text=text, corner_radius=50,
+                            fg_color="#00754A", font=("Montserrat", 13),
+                            width=120, height=30, command=command)
+    button.place(relx=relx, rely=rely, anchor=tk.SE)
+
+def delete_order(tree):
+    if not tree.selection():
+        messagebox.showwarning("No Item Selected", "Please select an item to delete.")
+        return
+    confirmation = messagebox.askyesno("Confirmation", "Are you sure you want to delete this order?")
+    if confirmation:
+        selected_item = tree.selection()[0]
+        order_id = tree.item(selected_item, 'text')
+        db.delete_order(order_id)
+        checkouts(root)
+
+def delete_all_orders():
+    confirmation = messagebox.askyesno("Confirmation", "Are you sure you want to delete all orders?")
+    if confirmation:
+        db.delete_orders()
+        checkouts(root)
+        messagebox.showinfo('Deleted All Orders', 'All orders have been deleted')
+        buy(root)
 
 # STARTING PAGE
 def homepage(root):
@@ -629,8 +684,8 @@ if __name__ == "__main__":
 
     try:
         # db.delete_orders()
-        # homepage(root)
-        buy(root)
+        homepage(root)
+        # buy(root)
     finally:
         # db.delete_orders()
         pass
