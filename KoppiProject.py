@@ -18,8 +18,8 @@ def center_window(root):
     screen_height = root.winfo_screenheight()
 
     # Calculate window width and height
-    window_width = 1024
-    window_height = 768
+    window_width = screen_width 
+    window_height = screen_height 
 
     # Calculate position for centering the window
     x_position = (screen_width - window_width) // 2
@@ -27,9 +27,6 @@ def center_window(root):
 
     # Set window geometry and position
     root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
-
-    # Doesn't allow for resizing
-    root.resizable(0, 0)
 
 # BUFFERING LOGO
 def logo(root):
@@ -621,15 +618,15 @@ def pastries_subcategory(root):
 if __name__ == "__main__":
     db = DB("KoppiProject.db")
     root = tk.Tk()
-    set_appearance_mode("system")
+    set_appearance_mode("light")
     set_default_color_theme("green")
     root.title("Ordering System")
     center_window(root)
 
     try:
-        # db.delete_orders()
+        db.delete_orders()
         # homepage(root)
-        buy(root)
+        # buy(root)
     finally:
         # db.delete_orders()
         pass
