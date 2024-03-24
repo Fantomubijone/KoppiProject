@@ -38,6 +38,11 @@ def logo(root):
     logo = ctk.CTkLabel(root, text='', image=pic)
     logo.pack(pady=(70, 0))
 
+# CHECKOUT BUTTON
+def checkout(root):
+    checkout_button = Button(root, text="Checkout", command = lambda:homepage(root))
+    checkout_button.place(relx=0.9, rely=0.9, anchor=SE)
+
 # STARTING PAGE
 def homepage(root):
     clear()
@@ -132,7 +137,6 @@ def signup_page(root):
                                   command=lambda: submit_signup_form(root, first_name_entry.get(), last_name_entry.get(), email_entry.get(),mobile_entry.get(), username_entry.get(),password_entry.get()))
     
     submit_button.grid(row=11, column=0, columnspan=2)
-
 
 # SIGN UP VALIDATION
 def submit_signup_form(root, fname, lname, email, mobilenum, uname, passw):
@@ -247,7 +251,7 @@ def buy(root):
                        light_image=Image.open("Images/Logo/Pasta.png"), size=(200, 200))
     imagePasta = ctk.CTkLabel(category_frame, text='', image=pas_img)
     imagePasta.grid(row=1, column=1, padx=10, pady=(0, 20), sticky="n")
-    imagePasta.bind("<Button-1>", lambda event: select_category("Pasta"))
+    imagePasta.bind("<Button-1>", lambda event: pasta_subcategory(root))
 
     pasta_label = Label(category_frame, text='Pasta', font=("Helvetica", 20))
     pasta_label.grid(row=2, column=1, padx=10, pady=(0, 20), sticky="n")
@@ -255,12 +259,14 @@ def buy(root):
     pst_img = CTkImage(dark_image=Image.open("Images/Logo/Pastries.png"), light_image=Image.open("Images/Logo/Pastries.png"), size=(200, 200))
     imagePastries = ctk.CTkLabel(category_frame, text='', image=pst_img)
     imagePastries.grid(row=1, column=2, padx=10, pady=(0, 20), sticky="n")  
-    imagePastries.bind("<Button-1>", lambda event: select_category("Pastries"))
+    imagePastries.bind("<Button-1>", lambda event: pastries_subcategory(root))
 
     pastries_label = Label(category_frame, text='Pastries', font=("Helvetica", 20))
     pastries_label.grid(row=2, column=2, padx=10, pady=(0, 20), sticky="n")
 
+    checkout(root)
 
+# SELECTING WHAT KIND OF DRINK
 def drink_catalog(root):
     clear()
     category_frame = Frame(root)
@@ -313,14 +319,16 @@ def drink_catalog(root):
     Choco_label = Label(category_frame, text='Chocolate', font=("Helvetica", 20))
     Choco_label.grid(row=3, column=3, padx=10, pady=(0, 20), sticky="n")
 
-
+    checkout(root)
+    
+# DISPLAYING AND ORDERING SPECIFIC DRINK
 def drink_subcategory(category):
     clear()
     left_frame = Frame(root)
-    left_frame.place(relx=0.325, rely=0.5, anchor=CENTER)  # Centering left frame
+    left_frame.place(relx=0.325, rely=0.5, anchor=CENTER)
 
     right_frame = Frame(root, highlightbackground="black", highlightcolor="black", highlightthickness=1, padx=30,pady=30)
-    right_frame.place(relx=0.775, rely=0.5, anchor=CENTER)  # Centering right frame
+    right_frame.place(relx=0.775, rely=0.5, anchor=CENTER)
 
     back_img = CTkImage(dark_image=Image.open("Images/Logo/Goback.png"), 
                             light_image=Image.open("Images/Logo/back.png"), size=(30, 30))
@@ -419,7 +427,7 @@ def drink_subcategory(category):
     add_order_button = Button(right_frame, text="Add Order", 
                             command=lambda: add_order_to_db(selected_item_name_label["text"], drink_size_var.get(), quantity_entry.get(), quantity_entry))
     add_order_button.grid(row=6, column=0, columnspan=3, padx=10, pady=10)
-    
+    checkout(root)
     disable_onload()
 
     def add_order_to_db(item_name, size, quantity, quantity_entry):
@@ -435,6 +443,180 @@ def drink_subcategory(category):
         messagebox.showinfo("Order Added",f"{item_name} has been added.")
         quantity_entry.delete(0, END)
 
+# DISPLAYING AND ORDERING SPECIFIC PASTA
+def pasta_subcategory(root):
+    clear()
+    left_frame = Frame(root)
+    left_frame.place(relx=0.325, rely=0.5, anchor=CENTER)  # Centering left frame
+
+    right_frame = Frame(root, highlightbackground="black", highlightcolor="black", highlightthickness=1, padx=30, pady=30)
+    right_frame.place(relx=0.775, rely=0.5, anchor=CENTER)  # Centering right frame
+
+    back_img = CTkImage(dark_image=Image.open("Images/Logo/Goback.png"), light_image=Image.open("Images/Logo/back.png"), size=(30, 30))
+    back_button = ctk.CTkLabel(left_frame, text='', image=back_img)
+    back_button.grid(row=0, column=0, pady=(10, 20), sticky="nw")
+    back_button.bind("<Button-1>", lambda event: buy(root))
+
+    db = DB("KoppiProject.db")
+    db.c.execute('''SELECT * FROM Pasta''')
+    pasta_data = db.c.fetchall()
+
+    def select_pasta(item_name, price,):
+        selected_item_name_label.config(text=item_name)
+        price_label.config(text=f"Price: {price:.0f}")
+        placeimg = CTkImage(dark_image=Image.open(f"Images/Pasta/{item_name}.png"),
+                            light_image=Image.open(f"Images/Pasta/{item_name}.png"), size=(200, 200))
+    
+        selected_item_image_label.configure(image=placeimg)
+        quantity_entry.configure(state="normal")
+        quantity_entry.delete(0,END)
+        add_order_button.configure(state='normal')
+
+
+    def add_order_to_db(item_name, price, quantity, quantity_entry):
+        if not quantity.isdigit():
+            messagebox.showerror("Error", "Quantity must be a valid number.")
+            quantity_entry.delete(0, END)
+            return
+
+        db.insert_into_orders(item_name, price, quantity)  # For pasta, size is not applicable
+        messagebox.showinfo("Order Added", f"{item_name} has been added.")
+        quantity_entry.delete(0, END)
+
+    def disable_onload():
+        quantity_entry.configure(state="disabled")
+        add_order_button.config(state="disabled")
+
+    for i, pasta_item in enumerate(pasta_data):
+        code_name, item_name, price = pasta_item
+
+        pasta_img = CTkImage(dark_image=Image.open(f"Images/Pasta/{item_name}.png"), 
+                             light_image=Image.open(f"Images/Pasta/{item_name}.png"), size=(160, 160))
+
+        pasta_image_label = ctk.CTkLabel(left_frame, text='', image=pasta_img)
+        pasta_image_label.grid(row=i+1, column=0)
+
+        pasta_label = Label(left_frame, text=item_name, font=("Helvetica", 16))
+        pasta_label.grid(row=i+1, column=1, padx=10, pady=10, sticky="w")
+
+        price_label = Label(left_frame, text=f"PRICE: {price:.0f}", justify="left")
+        price_label.grid(row=i+1, column=2, padx=10, pady=10)
+
+        select_button = Button(left_frame, text="Select", command=lambda item=item_name, price=price: select_pasta(item, price))
+        select_button.grid(row=i+1, column=3, padx=10, pady=10)
+
+    # Order form
+    order_label = Label(right_frame, text="Order Form", font=("Helvetica", 25, 'bold'))
+    order_label.grid(row=0, column=0, columnspan=3)
+
+
+    placeimg = CTkImage(dark_image=Image.open(f"Images/Logo/Product placeholder.png"),
+                            light_image=Image.open(f"Images/Logo/Product placeholder.png"), size=(100, 100))
+    
+    selected_item_image_label = ctk.CTkLabel(right_frame, text='', image=placeimg)
+    selected_item_image_label.grid(row=1, column=0, columnspan=3, padx=10, pady=10)
+
+    selected_item_name_label = Label(right_frame, text="Select a Pasta", font=("Helvetica", 18, 'bold'))
+    selected_item_name_label.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
+
+    price_label = Label(right_frame, text="Price: $0.00")
+    price_label.grid(row=3, column=0, columnspan=3, padx=10, pady=5)
+
+    quantity_entry = ctk.CTkEntry(right_frame, placeholder_text="Quantity", width=100, justify='center')
+    quantity_entry.grid(row=4, column=0, columnspan=3, padx=10, pady=10)
+
+    add_order_button = Button(right_frame, text="Add Order", command=lambda: add_order_to_db(selected_item_name_label["text"], price, quantity_entry.get(), quantity_entry))
+    add_order_button.grid(row=5, column=0, columnspan=3, padx=10, pady=10)
+    checkout(root)
+    disable_onload()
+
+# DISPLAYING AND ORDERING SPECIFIC PASTRIES
+def pastries_subcategory(root):
+    clear()
+    left_frame = Frame(root)
+    left_frame.place(relx=0.325, rely=0.5, anchor=CENTER) 
+
+    right_frame = Frame(root, highlightbackground="black", highlightcolor="black", highlightthickness=1, padx=30, pady=30)
+    right_frame.place(relx=0.775, rely=0.5, anchor=CENTER) 
+
+    back_img = CTkImage(dark_image=Image.open("Images/Logo/Goback.png"), light_image=Image.open("Images/Logo/back.png"), size=(30, 30))
+    back_button = ctk.CTkLabel(left_frame, text='', image=back_img)
+    back_button.grid(row=0, column=0, pady=(10, 20), sticky="nw")
+    back_button.bind("<Button-1>", lambda event: buy(root))
+
+    db = DB("KoppiProject.db")
+    db.c.execute('''SELECT * FROM Pastries''')
+    pastries_data = db.c.fetchall()
+
+    def select_pastries(item_name, price):
+        selected_item_name_label.config(text=item_name)
+        price_label.config(text=f"Price: {price:.2f}")  
+        placeimg = CTkImage(dark_image=Image.open(f"Images/Pastries/{item_name}.png"),
+                            light_image=Image.open(f"Images/Pastries/{item_name}.png"), size=(150, 150))
+
+        selected_item_image_label.configure(image=placeimg)
+        quantity_entry.configure(state="normal")
+        quantity_entry.delete(0, END)
+        add_order_button.configure(state='normal')
+
+
+    def add_order_to_db(item_name, price, quantity, quantity_entry):
+        if not quantity.isdigit():
+            messagebox.showerror("Error", "Quantity must be a valid number.")
+            quantity_entry.delete(0, END)
+            return
+
+        db.insert_into_orders(item_name, price, quantity)
+        messagebox.showinfo("Order Added", f"{item_name} has been added.")
+        quantity_entry.delete(0, END)
+
+    def disable_onload():
+        quantity_entry.configure(state="disabled")
+        add_order_button.config(state="disabled")
+
+    for i, pastries_item in enumerate(pastries_data):
+        code_name, item_name, price = pastries_item
+
+        pastri_img = CTkImage(dark_image=Image.open(f"Images/Pastries/{item_name}.png"), 
+                             light_image=Image.open(f"Images/Pastries/{item_name}.png"), size=(120,120))
+
+        pastri_image_label = ctk.CTkLabel(left_frame, text='', image=pastri_img)
+        pastri_image_label.grid(row=i+1, column=0)
+
+        pastri_label = Label(left_frame, text=item_name, font=("Helvetica", 16))
+        pastri_label.grid(row=i+1, column=1, padx=10, pady=10, sticky="w")
+
+        price_label = Label(left_frame, text=f"PRICE: {price:.2f}", justify="left")
+        price_label.grid(row=i+1, column=2, padx=10, pady=10)
+
+        select_button = Button(left_frame, text="Select", command=lambda item=item_name, price=price: select_pastries(item, price))
+        select_button.grid(row=i+1, column=3, padx=10, pady=10)
+
+    # Order form
+    order_label = Label(right_frame, text="Order Form", font=("Helvetica", 25, 'bold'))
+    order_label.grid(row=0, column=0, columnspan=3)
+
+
+    placeimg = CTkImage(dark_image=Image.open(f"Images/Logo/Product placeholder.png"),
+                            light_image=Image.open(f"Images/Logo/Product placeholder.png"), size=(100, 100))
+    
+    selected_item_image_label = ctk.CTkLabel(right_frame, text='', image=placeimg)
+    selected_item_image_label.grid(row=1, column=0, columnspan=3, padx=10, pady=10)
+
+    selected_item_name_label = Label(right_frame, text="Select a Pastry", font=("Helvetica", 18, 'bold'))
+    selected_item_name_label.grid(row=2, column=0, columnspan=3, padx=10, pady=10)
+
+    price_label = Label(right_frame, text="Price: 0.00")
+    price_label.grid(row=3, column=0, columnspan=3, padx=10, pady=5)
+
+    quantity_entry = ctk.CTkEntry(right_frame, placeholder_text="Quantity", width=100, justify='center')
+    quantity_entry.grid(row=4, column=0, columnspan=3, padx=10, pady=10)
+
+    add_order_button = Button(right_frame, text="Add Order", command=lambda: add_order_to_db(selected_item_name_label["text"], float(price_label['text'].replace("Price: ", "")), quantity_entry.get(), quantity_entry))
+    add_order_button.grid(row=5, column=0, columnspan=3, padx=10, pady=10)
+    checkout(root)
+    disable_onload()
+
 # MAIN 
 if __name__ == "__main__":
     db = DB("KoppiProject.db")
@@ -446,9 +628,10 @@ if __name__ == "__main__":
 
     try:
         # db.delete_orders()
-        homepage(root)
+        # homepage(root)
+        buy(root)
     finally:
         # db.delete_orders()
         pass
-    
+
     root.mainloop()

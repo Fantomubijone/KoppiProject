@@ -77,7 +77,7 @@ class DB:
         
         pasta_data = [
             ("PNN PST WTH MSHRM", "Penne Pesto with Mushroom", 205),
-            ("PLNT-BSD LSGN", "Plant-based Lasagna", 205)
+            ("PLNT-BSD LSGN", "Plant-Based Classic Lasagna", 205)
         ]
 
         for item in drinks_data:
