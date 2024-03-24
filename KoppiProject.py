@@ -26,7 +26,7 @@ def center_window(root):
     y_position = (screen_height - window_height) // 2
 
     # Set window geometry and position
-    root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+    root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position-45}")
 
 # BUFFERING LOGO
 def logo(root):
