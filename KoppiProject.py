@@ -19,7 +19,7 @@ def center_window(root):
 
     # Calculate window width and height
     window_width = screen_width - 200
-    window_height = screen_height - 200
+    window_height = screen_height - 150
 
     # Calculate position for centering the window
     x_position = (screen_width - window_width) // 2
@@ -618,7 +618,7 @@ def pastries_subcategory(root):
 if __name__ == "__main__":
     db = DB("KoppiProject.db")
     root = tk.Tk()
-    set_appearance_mode("system")
+    set_appearance_mode("light")
     set_default_color_theme("green")
     root.title("Ordering System")
     center_window(root)
