@@ -37,6 +37,7 @@ def logo(root):
     logo.pack(pady=(70, 0))
 
 
+
 # FLOATING BUTTONS
 def checkout(root):
     checkout_button = ctk.CTkButton(root, text="Checkout",
@@ -69,6 +70,7 @@ def back_to_buy(root):
     back_button = ctk.CTkLabel(root, text='', image=back_img)
     back_button.place(relx=0.1, rely=0.1, anchor=NW)
     back_button.bind("<Button-1>", lambda event: buy(root)) 
+
 
 
 
