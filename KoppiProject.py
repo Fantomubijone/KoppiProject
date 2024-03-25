@@ -49,7 +49,7 @@ def profilenav(root):
     db = DB("KoppiProject.db")
     user_details = db.get_current_user_details()
 
-    username = user_details[0]  # Assuming username is at index 0
+    username = user_details[0]  # Username is at index 0
     img = CTkImage(dark_image=Image.open("Images/Logo/profile-user_light.png"), 
                     light_image=Image.open("Images/Logo/profile-user_dark.png"), size=(40, 40))
 
@@ -71,10 +71,11 @@ def back_to_buy(root):
     back_button.bind("<Button-1>", lambda event: buy(root)) 
 
 
+
 # VALIDATION !!!
 ''' SIGN UP VALIDATION '''
 def submit_signup_form(root, fname, lname, email, mobilenum, uname, passw):
-
+    # Check if password is 8 characeters
     if len(passw) < 8:
         messagebox.showerror("Error", "Minimum password length is at least 8 characters")
         return
@@ -95,7 +96,7 @@ def submit_signup_form(root, fname, lname, email, mobilenum, uname, passw):
         messagebox.showerror("Error", "Username already exists. Please choose a different one.")
         return
 
-    # If all validations pass, proceed with signup
+    # If all validations check, proceed with signup
     db.insert_into_accounts(fname, lname, email, mobilenum, uname, passw)
 
     messagebox.showinfo("Success", "Sign up successful!")
@@ -111,16 +112,13 @@ def homepage(root):
     db.conn.execute('''DELETE FROM CurrentUser''')
     db.conn.commit()
 
-    # Create a frame to hold the label texts
     text_frame = Frame(root)
     text_frame.pack()
 
-    # Text before the bold part
     text_before_bold = "IT'S NOT JUST COFFEE, IT'S"
     label_before_bold = tk.Label(text_frame, text=text_before_bold, font=("Helvetica", 25))
     label_before_bold.pack(side=LEFT)
 
-    # Bold part
     bold_part = "STARBUCKS"
     label_bold = tk.Label(text_frame, text=bold_part, font=("Helvetica", 25, "bold"), fg="#00754A")
     label_bold.pack(side=LEFT)
@@ -134,7 +132,6 @@ def homepage(root):
 ''' LOGIN PAGE'''
 def login_page(root):
     clear()
-    # Create and display signup page
     login_frame = Frame(root)
     login_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
@@ -201,14 +198,12 @@ def login_page(root):
 ''' SIGN UP PAGE'''
 def signup_page(root):
     clear()
-    # Create and display signup page
     signup_frame = Frame(root)
     signup_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
     signup_label = tk.Label(signup_frame, text="Create an Account", font=("Segoe UI", 30, "bold"))  
     signup_label.grid(row=0, column=0, columnspan=2, pady=30)
 
-    # * indicates required field
     required_label = tk.Label(signup_frame, text="* Indicates required field", font=("Segoe UI", 10))  
     required_label.grid(row=1, column=0, padx=20, pady=(0,10))
 
@@ -268,7 +263,6 @@ def signup_page(root):
     
     submit_button.grid(row=11, column=0, columnspan=2)
 
-
 ''' EDIT PROFILE'''
 def editprofile(root):
     clear()
@@ -291,28 +285,28 @@ def editprofile(root):
     first_name_label.grid(row=3, column=0, sticky="w", padx=20, )
     first_name_entry = ctk.CTkEntry(edit_frame)
     first_name_entry.grid(row=3, column=1, sticky="w", padx=(0, 20))
-    first_name_entry.insert(0, user_details[1])  # Assuming first name is at index 1
+    first_name_entry.insert(0, user_details[1])  # First name is at index 1
 
     # Last Name
     last_name_label = tk.Label(edit_frame, text="Last Name:", font=("Segoe UI", 10))
     last_name_label.grid(row=4, column=0, sticky="w", padx=20)
     last_name_entry = ctk.CTkEntry(edit_frame) 
     last_name_entry.grid(row=4, column=1, sticky="w", padx=(0, 20))
-    last_name_entry.insert(0, user_details[2])  # Assuming last name is at index 2
+    last_name_entry.insert(0, user_details[2])  # Last name is at index 2
 
     # Email
     email_label = tk.Label(edit_frame, text="Email:", font=("Segoe UI", 10))
     email_label.grid(row=5, column=0, sticky="w", padx=20)
     email_entry = ctk.CTkEntry(edit_frame) 
     email_entry.grid(row=5, column=1, sticky="w", padx=(0, 20))
-    email_entry.insert(0, user_details[3])  # Assuming email is at index 3
+    email_entry.insert(0, user_details[3])  # Email is at index 3
 
     # Mobile Number
     mobile_label = tk.Label(edit_frame, text="Mobile Number:", font=("Segoe UI", 10))
     mobile_label.grid(row=6, column=0, sticky="w", padx=20)
     mobile_entry = ctk.CTkEntry(edit_frame) 
     mobile_entry.grid(row=6, column=1, sticky="w", padx=(0, 20))
-    mobile_entry.insert(0, user_details[4])  # Assuming mobile number is at index 4
+    mobile_entry.insert(0, user_details[4])  # Mobile number is at index 4
 
     # Account Security
     account_security_label = tk.Label(edit_frame, text="Account Security", font=("Segoe UI", 15, "bold")) 
@@ -340,7 +334,6 @@ def editprofile(root):
     password_entry.configure(state='disabled')
 
     def enable_entries():
-        # Enable all entry fields except the username
         first_name_entry.configure(state='normal')
         last_name_entry.configure(state='normal')
         email_entry.configure(state='normal')
@@ -414,14 +407,13 @@ def editprofile(root):
     save_button.grid(row=11, column=0, columnspan=2, pady=5)
     logout_button.grid(row=12, column=0, columnspan=2, pady=5) 
 
-
 ''' ORDER SUMMARY PAGE '''
 def checkouts(root):
     clear()
     profilenav(root)
     back_to_buy(root)
     # Fetch data from the Orders table
-    current_username = db.get_current_username()  # You need to implement this function
+    current_username = db.get_current_username() 
     orders = db.fetch_orders_by_username(current_username)
 
     if not orders:
@@ -429,7 +421,6 @@ def checkouts(root):
         buy(root)
 
     else:
-        # Create a frame to hold the treeview and buttons
         frame = tk.Frame(root)
         frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
@@ -437,19 +428,17 @@ def checkouts(root):
         header_label = tk.Label(frame, text="ORDER SUMMARY", font=("Helvetica", 40, "bold"))
         header_label.pack(pady=(10, 20))
 
-        # Create treeview widget
         tree = ttk.Treeview(frame, height=18)
         tree['columns'] = ('Item Name', 'Price', 'Quantity')
 
-        # Define column headings
+        # Column headings
         tree.heading('#0', text='ID')
         tree.heading('Item Name', text='Item Name')
         tree.heading('Price', text='Price')
         tree.heading('Quantity', text='Quantity')
 
-        # Insert data into the tree
-        for order in orders:
-            tree.insert('', 'end', text=order[0], values=(order[2], order[3], order[4]))
+        for deets in orders:
+            tree.insert('', 'end', text=deets[0], values=(deets[2], deets[3], deets[4]))
 
         # Place the tree in the frame
         tree.pack(pady=(50,50))
@@ -484,6 +473,7 @@ def checkouts(root):
                 checkouts(root)
                 messagebox.showinfo('Deleted All Orders', 'All orders have been deleted')
                 buy(root)
+
 
 
 # ORDERING PAGES
@@ -613,7 +603,7 @@ def drink_subcategory(category):
     else:
         return
 
-    # Displaying drink details and select button
+    # Displaying in the orderform
     def select_item(item_name, tall_price, grande_price, venti_price):
         placeimg = CTkImage(dark_image=Image.open(f"Images/Drinks/{category}/{item_name}.png"),
                             light_image=Image.open(f"Images/Drinks/{category}/{item_name}.png"), size=(100, 100))
@@ -710,10 +700,10 @@ def pasta_subcategory(root):
     clear()
     profilenav(root)
     left_frame = Frame(root)
-    left_frame.place(relx=0.325, rely=0.5, anchor=CENTER)  # Centering left frame
+    left_frame.place(relx=0.325, rely=0.5, anchor=CENTER) 
 
     right_frame = Frame(root, highlightbackground="black", highlightcolor="black", highlightthickness=1, padx=30, pady=30)
-    right_frame.place(relx=0.775, rely=0.5, anchor=CENTER)  # Centering right frame
+    right_frame.place(relx=0.775, rely=0.5, anchor=CENTER) 
 
     back_img = CTkImage(dark_image=Image.open("Images/Logo/Goback.png"), light_image=Image.open("Images/Logo/back.png"), size=(30, 30))
     back_button = ctk.CTkLabel(left_frame, text='', image=back_img)
@@ -742,7 +732,7 @@ def pasta_subcategory(root):
             quantity_entry.delete(0, END)
             return
 
-        db.insert_into_orders(db.get_current_username(),item_name, price, quantity)  # For pasta, size is not applicable
+        db.insert_into_orders(db.get_current_username(),item_name, price, quantity) 
         messagebox.showinfo("Order Added", f"{item_name} has been added.")
         quantity_entry.delete(0, END)
 
