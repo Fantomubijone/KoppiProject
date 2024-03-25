@@ -1,12 +1,14 @@
 import sqlite3
 
 class DB:
+
     def __init__(self, db_name):
         self.conn = sqlite3.connect(db_name)
         self.c = self.conn.cursor()
         self.create_accounts_table()
         self.create_menu_tables()  
         self.create_orders_table()
+        self.create_current_user_table()
         
     def create_accounts_table(self):
         self.c.execute('''CREATE TABLE IF NOT EXISTS Accounts (
@@ -107,7 +109,7 @@ class DB:
             return True
         else:
             return False
-        
+
     def user_exists(self, username):
         self.c.execute('''SELECT * FROM Accounts WHERE username=?''', (username,))
         result = self.c.fetchone()
@@ -120,21 +122,69 @@ class DB:
     def create_orders_table(self):
         self.c.execute('''CREATE TABLE IF NOT EXISTS Orders (
                             id INTEGER PRIMARY KEY,
+                            username TEXT,
                             item_name TEXT,
                             price REAL,
                             quantity INTEGER
                         )''')
         self.conn.commit()
 
-    def insert_into_orders(self, item_name, price, quantity):   
-        self.c.execute('''INSERT INTO Orders (item_name, price, quantity)
-                        VALUES (?, ?, ?)''', (item_name, price, quantity))
+    def insert_into_orders(self, username, item_name, price, quantity):   
+        self.c.execute('''INSERT INTO Orders (username, item_name, price, quantity)
+                        VALUES (?, ?, ?, ?)''', (username, item_name, price, quantity))
         self.conn.commit()
 
-    def delete_orders(self): # To reset order
-        self.c.execute('''DELETE FROM Orders''')
+    def fetch_orders_by_username(self, username):
+        self.c.execute('''SELECT * FROM Orders WHERE username=?''', (username,))
+        return self.c.fetchall()
+
+    def delete_orders_by_username(self, username):
+        self.c.execute('''DELETE FROM Orders WHERE username=?''', (username,))
         self.conn.commit()
 
     def delete_order(self, order_id):
         self.c.execute('''DELETE FROM Orders WHERE id=?''', (order_id,))
+        self.conn.commit()
+
+    def create_current_user_table(self):
+        self.c.execute('''CREATE TABLE IF NOT EXISTS CurrentUser (
+                            username TEXT PRIMARY KEY,
+                            first_name TEXT,
+                            last_name TEXT,
+                            email TEXT,
+                            mobile_number TEXT,
+                            password TEXT
+                        )''')
+        self.conn.commit()
+
+    def set_current_user(self, username):
+        # Fetch user details from Accounts table
+        self.c.execute('''SELECT first_name, last_name, email, mobile_number, username, password FROM Accounts WHERE username=?''', (username,))
+        user_details = self.c.fetchone()
+        if user_details:
+            # Insert or update the current user details in CurrentUser table
+            self.c.execute('''INSERT OR REPLACE INTO CurrentUser (first_name, last_name, email, mobile_number, username, password)
+                                VALUES (?, ?, ?, ?, ?, ?)''', user_details)  
+            self.conn.commit()
+        else:
+            print("User not found in Accounts table.")
+
+    def get_current_user_details(self):
+        self.c.execute('''SELECT * FROM CurrentUser''')
+        return self.c.fetchone()
+    
+    def get_current_username(self):
+        self.c.execute('''SELECT username FROM CurrentUser''')
+        username_row = self.c.fetchone()
+        return username_row[0]
+    
+    def update_user_details(self, first_name, last_name, email, mobile_number, password, username):
+        # Update details in CurrentUser table
+        self.c.execute('''UPDATE CurrentUser SET first_name=?, last_name=?, email=?, mobile_number=?, password=? WHERE username=?''',
+                        (first_name, last_name, email, mobile_number, password, username))
+        self.conn.commit()
+
+        # Update details in Accounts table
+        self.c.execute('''UPDATE Accounts SET first_name=?, last_name=?, email=?, mobile_number=?, password=? WHERE username=?''',
+                        (first_name, last_name, email, mobile_number, password, username))
         self.conn.commit()

@@ -36,7 +36,8 @@ def logo(root):
     logo = ctk.CTkLabel(root, text='', image=pic)
     logo.pack(pady=(70, 0))
 
-# CHECKOUT BUTTON
+
+# FLOATING BUTTONS
 def checkout(root):
     checkout_button = ctk.CTkButton(root, text="Checkout",
                                   corner_radius=50, fg_color="#00754A",
@@ -44,65 +45,71 @@ def checkout(root):
                                        command=lambda: checkouts(root))
     checkout_button.place(relx=0.9, rely=0.9, anchor=SE)
 
-def checkouts(root):
-    clear()
+def profilenav(root):
+    db = DB("KoppiProject.db")
+    user_details = db.get_current_user_details()
 
-    # Create treeview widget
-    tree = ttk.Treeview(root)
-    tree['columns'] = ('Item Name', 'Price', 'Quantity')
+    username = user_details[0]  # Assuming username is at index 0
+    img = CTkImage(dark_image=Image.open("Images/Logo/profile-user_light.png"), 
+                    light_image=Image.open("Images/Logo/profile-user_dark.png"), size=(40, 40))
 
-    # Define column headings
-    tree.heading('#0', text='ID')
-    tree.heading('Item Name', text='Item Name')
-    tree.heading('Price', text='Price')
-    tree.heading('Quantity', text='Quantity')
+    profile_frame = Frame(root)
+    profile_frame.pack(anchor='ne', padx=50, pady=50)
 
-    # Fetch data from the Orders table
-    db.c.execute('''SELECT * FROM Orders''')
-    orders = db.c.fetchall()
+    profile_button = ctk.CTkLabel(profile_frame, image=img, text='')
+    profile_button.pack(side='right')
 
-    # Insert data into the tree
-    for order in orders:
-        tree.insert('', 'end', text=order[0], values=(order[1], order[2], order[3]))
+    username_label = tk.Label(profile_frame, text=(f"{username.upper()}"), font=('Helvetica', 14, 'bold'))
+    username_label.pack(side='right', padx=(0, 10))
+    profile_button.bind("<Button-1>", lambda event: editprofile(root))
 
-    # Place the tree on the root window
-    tree.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+def back_to_buy(root):
+    back_img = CTkImage(dark_image=Image.open("Images/Logo/Goback.png"), 
+                        light_image=Image.open("Images/Logo/back.png"), size=(50, 50))
+    back_button = ctk.CTkLabel(root, text='', image=back_img)
+    back_button.place(relx=0.1, rely=0.1, anchor=NW)
+    back_button.bind("<Button-1>", lambda event: buy(root)) 
 
-    # Add buttons for various actions
-    create_button(root, "Pay now", lambda: payment(tree), 0.7, 0.9)
-    create_button(root, "Add More Order", lambda: buy(root), 0.5, 0.9)
-    create_button(root, "Delete Order", lambda: delete_order(tree), 0.3, 0.9)
-    create_button(root, "Delete All Orders", delete_all_orders, 0.1, 0.9)
 
-def create_button(root, text, command, relx, rely):
-    button = ctk.CTkButton(root, text=text, corner_radius=50,
-                            fg_color="#00754A", font=("Montserrat", 13),
-                            width=120, height=30, command=command)
-    button.place(relx=relx, rely=rely, anchor=tk.SE)
+# VALIDATION !!!
+''' SIGN UP VALIDATION '''
+def submit_signup_form(root, fname, lname, email, mobilenum, uname, passw):
 
-def delete_order(tree):
-    if not tree.selection():
-        messagebox.showwarning("No Item Selected", "Please select an item to delete.")
+    if len(passw) < 8:
+        messagebox.showerror("Error", "Minimum password length is at least 8 characters")
         return
-    confirmation = messagebox.askyesno("Confirmation", "Are you sure you want to delete this order?")
-    if confirmation:
-        selected_item = tree.selection()[0]
-        order_id = tree.item(selected_item, 'text')
-        db.delete_order(order_id)
-        checkouts(root)
 
-def delete_all_orders():
-    confirmation = messagebox.askyesno("Confirmation", "Are you sure you want to delete all orders?")
-    if confirmation:
-        db.delete_orders()
-        checkouts(root)
-        messagebox.showinfo('Deleted All Orders', 'All orders have been deleted')
-        buy(root)
+    # Check if all fields are filled
+    if not all([fname, lname, email, mobilenum, uname, passw]):
+        messagebox.showerror("Error", "Please fill in all the fields.")
+        return  
 
-# STARTING PAGE
+    # Check if mobile number is valid
+    if len(mobilenum) != 11 or not mobilenum.isdigit():
+        messagebox.showerror("Error", "Mobile number must be a 11-digit number.")
+        return
+
+    # Check if username already exists
+    db = DB("KoppiProject.db")
+    if db.user_exists(uname):
+        messagebox.showerror("Error", "Username already exists. Please choose a different one.")
+        return
+
+    # If all validations pass, proceed with signup
+    db.insert_into_accounts(fname, lname, email, mobilenum, uname, passw)
+
+    messagebox.showinfo("Success", "Sign up successful!")
+    login_page(root)
+
+# PAGES!!!!
+''' STARTING PAGE '''
 def homepage(root):
     clear()
     logo(root)
+
+    db = DB('KoppiProject.db')
+    db.conn.execute('''DELETE FROM CurrentUser''')
+    db.conn.commit()
 
     # Create a frame to hold the label texts
     text_frame = Frame(root)
@@ -124,7 +131,74 @@ def homepage(root):
                                        command=lambda: login_page(root))
     get_started_button.pack(pady=(20, 0))
 
-# SIGN UP
+''' LOGIN PAGE'''
+def login_page(root):
+    clear()
+    # Create and display signup page
+    login_frame = Frame(root)
+    login_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+
+    login_label = tk.Label(login_frame, text="Sign in to Account", font=("Segoe UI", 30, "bold"))  
+    login_label.grid(row=0, column=0, columnspan=2, pady=30)
+
+    
+    required_label = tk.Label(login_frame, text="* Indicates required field", font=("Segoe UI", 10))  
+    required_label.grid(row=1, column=0, padx=20, pady=(0,10))
+
+    # Username
+    username_label = tk.Label(login_frame, text="Username:", font=("Segoe UI", 10))
+    username_label.grid(row=2, column=0, sticky="w", padx=20)
+    username_entry = ctk.CTkEntry(login_frame) 
+    username_entry.grid(row=2, column=1, sticky="w", padx=(0, 20))
+
+    # Password
+    password_label = tk.Label(login_frame, text="Password:", font=("Segoe UI", 10))
+    password_label.grid(row=3, column=0, sticky="w", padx=20)
+    password_entry = ctk.CTkEntry(login_frame, show="*")  
+    password_entry.grid(row=3, column=1, sticky="w", padx=(0, 20))
+
+    # go to login
+    goto_signup = tk.Label(login_frame, text="Don't have any account?", font=("Segoe UI", 10), fg="#00754A", cursor="hand2")
+    goto_signup.grid(row=4, column=0, columnspan=2, pady=20)
+    goto_signup.bind("<Button-1>", lambda event: signup_page(root))
+
+    # Login Button
+    login_button = ctk.CTkButton(login_frame, text="Sign In",
+                                  corner_radius=50, fg_color="#00754A",
+                                  font=("Montserrat", 13), width=120, height=30,
+                                  command = lambda:login(username_entry.get(), password_entry.get()))
+    login_button.grid(row=5, column=0, columnspan=2)
+
+    # LOGIN VALIDATION
+    def login(username, password):
+        
+        if not username or not password:
+            messagebox.showerror("Error", "Please enter both username and password.")
+            username_entry.delete(0, 'end')
+            password_entry.delete(0, 'end')
+            return
+
+        db = DB("KoppiProject.db")
+
+        if db.user_exists(username):
+            if db.validate_login(username, password):
+                messagebox.showinfo("Success", "Login Successful!")
+                db.set_current_user(username)
+                buy(root)
+            else:
+                messagebox.showerror("Error", "Invalid username or password.")
+        else:
+            messagebox.showerror("Error", "User not found!")
+            create = messagebox.askquestion("Create an Account", "Would you like to make an account")
+            if create == 'yes':
+                signup_page(root)
+            else:
+                username_entry.delete(0, 'end')
+                password_entry.delete(0, 'end')
+                password = ''
+                username = ''
+
+''' SIGN UP PAGE'''
 def signup_page(root):
     clear()
     # Create and display signup page
@@ -194,105 +268,235 @@ def signup_page(root):
     
     submit_button.grid(row=11, column=0, columnspan=2)
 
-# SIGN UP VALIDATION
-def submit_signup_form(root, fname, lname, email, mobilenum, uname, passw):
-    # Check if all fields are filled
-    if not all([fname, lname, email, mobilenum, uname, passw]):
-        messagebox.showerror("Error", "Please fill in all the fields.")
-        return  
 
-    # Check if mobile number is valid
-    if len(mobilenum) != 11 or not mobilenum.isdigit():
-        messagebox.showerror("Error", "Mobile number must be a 11-digit number.")
-        return
-
-    # Check if username already exists
-    db = DB("KoppiProject.db")
-    if db.user_exists(uname):
-        messagebox.showerror("Error", "Username already exists. Please choose a different one.")
-        return
-
-    # If all validations pass, proceed with signup
-    db.insert_into_accounts(fname, lname, email, mobilenum, uname, passw)
-
-    messagebox.showinfo("Success", "Sign up successful!")
-    login_page(root)
-
-# LOGIN PAGE
-def login_page(root):
+''' EDIT PROFILE'''
+def editprofile(root):
     clear()
-    # Create and display signup page
-    login_frame = Frame(root)
-    login_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
+    db = DB("KoppiProject.db")
+    user_details = db.get_current_user_details()
 
-    login_label = tk.Label(login_frame, text="Sign in to Account", font=("Segoe UI", 30, "bold"))  
-    login_label.grid(row=0, column=0, columnspan=2, pady=30)
+    back_to_buy(root)
+    edit_frame = Frame(root)
+    edit_frame.place(relx=0.5, rely=0.5, anchor=CENTER)
 
-    
-    required_label = tk.Label(login_frame, text="* Indicates required field", font=("Segoe UI", 10))  
-    required_label.grid(row=1, column=0, padx=20, pady=(0,10))
+    signup_label = tk.Label(edit_frame, text="User Profile", font=("Segoe UI", 30, "bold"))  
+    signup_label.grid(row=0, column=0, columnspan=2, pady=30)
+
+    # Personal Information
+    personal_info_label = tk.Label(edit_frame, text="Personal Information", font=("Segoe UI", 15, "bold")) 
+    personal_info_label.grid(row=2, column=0, columnspan=2, sticky="w", padx=20, pady=(0,10))
+
+    # First Name
+    first_name_label = tk.Label(edit_frame, text="First Name:", font=("Segoe UI", 10))
+    first_name_label.grid(row=3, column=0, sticky="w", padx=20, )
+    first_name_entry = ctk.CTkEntry(edit_frame)
+    first_name_entry.grid(row=3, column=1, sticky="w", padx=(0, 20))
+    first_name_entry.insert(0, user_details[1])  # Assuming first name is at index 1
+
+    # Last Name
+    last_name_label = tk.Label(edit_frame, text="Last Name:", font=("Segoe UI", 10))
+    last_name_label.grid(row=4, column=0, sticky="w", padx=20)
+    last_name_entry = ctk.CTkEntry(edit_frame) 
+    last_name_entry.grid(row=4, column=1, sticky="w", padx=(0, 20))
+    last_name_entry.insert(0, user_details[2])  # Assuming last name is at index 2
+
+    # Email
+    email_label = tk.Label(edit_frame, text="Email:", font=("Segoe UI", 10))
+    email_label.grid(row=5, column=0, sticky="w", padx=20)
+    email_entry = ctk.CTkEntry(edit_frame) 
+    email_entry.grid(row=5, column=1, sticky="w", padx=(0, 20))
+    email_entry.insert(0, user_details[3])  # Assuming email is at index 3
+
+    # Mobile Number
+    mobile_label = tk.Label(edit_frame, text="Mobile Number:", font=("Segoe UI", 10))
+    mobile_label.grid(row=6, column=0, sticky="w", padx=20)
+    mobile_entry = ctk.CTkEntry(edit_frame) 
+    mobile_entry.grid(row=6, column=1, sticky="w", padx=(0, 20))
+    mobile_entry.insert(0, user_details[4])  # Assuming mobile number is at index 4
+
+    # Account Security
+    account_security_label = tk.Label(edit_frame, text="Account Security", font=("Segoe UI", 15, "bold")) 
+    account_security_label.grid(row=7, column=0, columnspan=2, sticky="w", padx=20, pady=(20,10))
 
     # Username
-    username_label = tk.Label(login_frame, text="Username:", font=("Segoe UI", 10))
-    username_label.grid(row=2, column=0, sticky="w", padx=20)
-    username_entry = ctk.CTkEntry(login_frame) 
-    username_entry.grid(row=2, column=1, sticky="w", padx=(0, 20))
+    username_label = tk.Label(edit_frame, text="Username:", font=("Segoe UI", 10))
+    username_label.grid(row=8, column=0, sticky="w", padx=20)
+    username_entry = ctk.CTkEntry(edit_frame) 
+    username_entry.grid(row=8, column=1, sticky="w", padx=(0, 20))
+    username_entry.insert(0, user_details[0])  # Assuming username is at index 0
 
     # Password
-    password_label = tk.Label(login_frame, text="Password:", font=("Segoe UI", 10))
-    password_label.grid(row=3, column=0, sticky="w", padx=20)
-    password_entry = ctk.CTkEntry(login_frame, show="*")  
-    password_entry.grid(row=3, column=1, sticky="w", padx=(0, 20))
+    password_label = tk.Label(edit_frame, text="Password:", font=("Segoe UI", 10))
+    password_label.grid(row=9, column=0, sticky="w", padx=20)
+    password_entry = ctk.CTkEntry(edit_frame, show="*")  
+    password_entry.grid(row=9, column=1, sticky="w", padx=(0, 20))
+    password_entry.insert(0, user_details[5])  # Assuming password is at index 5
 
-    # go to login
-    goto_signup = tk.Label(login_frame, text="Don't have any account?", font=("Segoe UI", 10), fg="#00754A", cursor="hand2")
-    goto_signup.grid(row=4, column=0, columnspan=2, pady=20)
-    goto_signup.bind("<Button-1>", lambda event: signup_page(root))
+    first_name_entry.configure(state='disabled')
+    last_name_entry.configure(state='disabled')
+    email_entry.configure(state='disabled')
+    mobile_entry.configure(state='disabled')
+    username_entry.configure(state='disabled')
+    password_entry.configure(state='disabled')
 
-    # Login Button
-    login_button = ctk.CTkButton(login_frame, text="Sign In",
-                                  corner_radius=50, fg_color="#00754A",
-                                  font=("Montserrat", 13), width=120, height=30,
-                                  command = lambda:login(username_entry.get(), password_entry.get()))
-    login_button.grid(row=5, column=0, columnspan=2)
+    def enable_entries():
+        # Enable all entry fields except the username
+        first_name_entry.configure(state='normal')
+        last_name_entry.configure(state='normal')
+        email_entry.configure(state='normal')
+        mobile_entry.configure(state='normal')
+        password_entry.configure(state='normal')
 
-    # LOGIN VALIDATION
-    def login(username, password):
-        
-        if not username or not password:
-            messagebox.showerror("Error", "Please enter both username and password.")
-            username_entry.delete(0, 'end')
-            password_entry.delete(0, 'end')
+    def confirm_logout(root):
+        confirmation = messagebox.askyesno("Logout Confirmation", "Are you sure you want to logout?")
+        if confirmation:
+            homepage(root)
+
+    def save_changes():
+        #lenght of password
+        if len(password_entry.get()) < 8:
+            messagebox.showerror("Error", "Minimum password length is at least 8 characters")
             return
 
-        db = DB("KoppiProject.db")
+        # Check if all fields are filled
+        if not all([first_name_entry.get(), last_name_entry.get(), email_entry.get(), 
+                    mobile_entry.get(), username_entry.get(), password_entry.get()]):
+            messagebox.showerror("Error", "Please fill in all the fields.")
+            return  
 
-        if db.user_exists(username):
-            if db.validate_login(username, password):
-                messagebox.showinfo("Success", "Login Successful!")
-                buy(root)
+        # Check if mobile number is valid
+        if len(mobile_entry.get()) != 11 or not mobile_entry.get().isdigit():
+            messagebox.showerror("Error", "Mobile number must be a 11-digit number.")
+            return
+        
+         # Confirm with the user before saving changes
+        confirmation = messagebox.askokcancel("Confirm Changes", "Are you sure you want to save the changes?")
+
+        if confirmation:
+            # Update the user details in the database
+            db.update_user_details(
+                first_name_entry.get(),
+                last_name_entry.get(),
+                email_entry.get(),
+                mobile_entry.get(),
+                password_entry.get(),
+                username_entry.get()
+            )
+
+             # Check if the password has been changed
+            if password_entry.get() != user_details[5]:
+                messagebox.showinfo('Password Change', 'Your password has been changed. Please log in again.')
+                homepage(root)
             else:
-                messagebox.showerror("Error", "Invalid username or password.")
+                messagebox.showinfo('Information Updated', 'Your information has been updated successfully.')
+                editprofile(root)
         else:
-            messagebox.showerror("Error", "User not found!")
-            create = messagebox.askquestion("Create an Account", "Would you like to make an account")
-            if create == 'yes':
-                signup_page(root)
-            else:
-                username_entry.delete(0, 'end')
-                password_entry.delete(0, 'end')
-                password = ''
-                username = ''
+            messagebox.showinfo("Changes Discarded", "Changes have been discarded.")
+            buy(root)
 
-# SELECTING CATEGORY
+
+    logout_button = ctk.CTkButton(edit_frame, text="Logout", corner_radius=50, fg_color="#00754A",
+                                  font=("Montserrat", 13), width=120, height=30,
+                                  command=lambda: confirm_logout(root))  # will close the application
+
+    edit_button = ctk.CTkButton(edit_frame, text="Edit", corner_radius=50, fg_color="#00754A",
+                                  font=("Montserrat", 13), width=120, height=30,
+                                  command=enable_entries)  # will enable entry fields for editing
+
+
+    save_button = ctk.CTkButton(edit_frame, text="Save", corner_radius=50, fg_color="#00754A",
+                                  font=("Montserrat", 13), width=120, height=30,
+                                  command=save_changes)  # will save changes to the database
+  
+
+
+    edit_button.grid(row=10, column=0,columnspan=2, pady=(30,5))
+    save_button.grid(row=11, column=0, columnspan=2, pady=5)
+    logout_button.grid(row=12, column=0, columnspan=2, pady=5) 
+
+
+''' ORDER SUMMARY PAGE '''
+def checkouts(root):
+    clear()
+    profilenav(root)
+    back_to_buy(root)
+    # Fetch data from the Orders table
+    current_username = db.get_current_username()  # You need to implement this function
+    orders = db.fetch_orders_by_username(current_username)
+
+    if not orders:
+        messagebox.showinfo("No Orders", "There are currently no orders placed.")
+        buy(root)
+
+    else:
+        # Create a frame to hold the treeview and buttons
+        frame = tk.Frame(root)
+        frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+        # Header
+        header_label = tk.Label(frame, text="ORDER SUMMARY", font=("Helvetica", 40, "bold"))
+        header_label.pack(pady=(10, 20))
+
+        # Create treeview widget
+        tree = ttk.Treeview(frame, height=18)
+        tree['columns'] = ('Item Name', 'Price', 'Quantity')
+
+        # Define column headings
+        tree.heading('#0', text='ID')
+        tree.heading('Item Name', text='Item Name')
+        tree.heading('Price', text='Price')
+        tree.heading('Quantity', text='Quantity')
+
+        # Insert data into the tree
+        for order in orders:
+            tree.insert('', 'end', text=order[0], values=(order[2], order[3], order[4]))
+
+        # Place the tree in the frame
+        tree.pack(pady=(50,50))
+
+        # Add buttons for various actions
+        create_button(frame, "Pay now", lambda: payment(tree))
+        create_button(frame, "Add More Order", lambda: buy(root))
+        create_button(frame, "Delete Order", lambda: delete_order(tree))
+        create_button(frame, "Delete All Orders", lambda: delete_all_orders(current_username))
+
+        def create_button(parent, text, command):
+            button = ctk.CTkButton(parent, text=text, corner_radius=50,
+                            fg_color="#00754A", font=("Montserrat", 13),
+                            width=200, height=30, command=command)
+            button.pack(pady=5)
+
+        def delete_order(tree):    
+            if not tree.selection():
+                messagebox.showwarning("No Item Selected", "Please select an item to delete.")
+                return
+            confirmation = messagebox.askyesno("Confirmation", "Are you sure you want to delete this order?")
+            if confirmation:
+                selected_item = tree.selection()[0]
+                order_id = tree.item(selected_item, 'text')
+                db.delete_order(order_id)
+                checkouts(root)
+
+        def delete_all_orders(user):
+            confirmation = messagebox.askyesno("Confirmation", "Are you sure you want to delete all orders?")
+            if confirmation:
+                db.delete_orders_by_username(user)
+                checkouts(root)
+                messagebox.showinfo('Deleted All Orders', 'All orders have been deleted')
+                buy(root)
+
+
+# ORDERING PAGES
+'''SELECTING CATEGORY'''
 def buy(root):
     clear()
+    profilenav(root)
     category_frame = Frame(root)
     category_frame.pack(pady=20)
 
     # Text label
     selected_category_label = Label(category_frame, text="Please select a category", font=("Helvetica", 30))
-    selected_category_label.grid(row=0, column=0, columnspan=3, pady=(190, 30), sticky="n")
+    selected_category_label.grid(row=0, column=0, columnspan=3, pady=35, sticky="n")
 
     dr_img = CTkImage(dark_image=Image.open("Images/Logo/Drinks.png"), 
                       light_image=Image.open("Images/Logo/Drinks.png"), size=(200, 200))
@@ -322,16 +526,17 @@ def buy(root):
 
     checkout(root)
 
-# SELECTING WHAT KIND OF DRINK
+'''SELECTING WHAT KIND OF DRINK'''
 def drink_catalog(root):
     clear()
+    profilenav(root)
     category_frame = Frame(root)
-    category_frame.pack(pady=20)
+    category_frame.pack()
 
     back_img = CTkImage(dark_image=Image.open("Images/Logo/Goback.png"), 
                         light_image=Image.open("Images/Logo/back.png"), size=(50, 50))
     back_button = ctk.CTkLabel(category_frame, text='', image=back_img)
-    back_button.grid(row=0, column=0, padx=10, pady=(80, 40), sticky="nw")
+    back_button.grid(row=0, column=0, padx=10, pady=(0, 40), sticky="nw")
     back_button.bind("<Button-1>", lambda event: buy(root)) 
 
     selected_kind = Label(category_frame, text="Select kind of drink", font=("Helvetica", 30))
@@ -377,9 +582,10 @@ def drink_catalog(root):
 
     checkout(root)
     
-# DISPLAYING AND ORDERING SPECIFIC DRINK
+'''DISPLAYING AND ORDERING SPECIFIC DRINK'''
 def drink_subcategory(category):
     clear()
+    profilenav(root)
     left_frame = Frame(root)
     left_frame.place(relx=0.325, rely=0.5, anchor=CENTER)
 
@@ -492,16 +698,17 @@ def drink_subcategory(category):
             quantity_entry.delete(0, END)
             return
             
-        db.insert_into_orders(item_name, size, quantity)
+        db.insert_into_orders(db.get_current_username(), item_name, size, quantity)
         print(item_name)
         print(size)
         print(quantity)
         messagebox.showinfo("Order Added",f"{item_name} has been added.")
         quantity_entry.delete(0, END)
 
-# DISPLAYING AND ORDERING SPECIFIC PASTA
+'''DISPLAYING AND ORDERING SPECIFIC PASTA'''
 def pasta_subcategory(root):
     clear()
+    profilenav(root)
     left_frame = Frame(root)
     left_frame.place(relx=0.325, rely=0.5, anchor=CENTER)  # Centering left frame
 
@@ -535,7 +742,7 @@ def pasta_subcategory(root):
             quantity_entry.delete(0, END)
             return
 
-        db.insert_into_orders(item_name, price, quantity)  # For pasta, size is not applicable
+        db.insert_into_orders(db.get_current_username(),item_name, price, quantity)  # For pasta, size is not applicable
         messagebox.showinfo("Order Added", f"{item_name} has been added.")
         quantity_entry.delete(0, END)
 
@@ -586,9 +793,10 @@ def pasta_subcategory(root):
     checkout(root)
     disable_onload()
 
-# DISPLAYING AND ORDERING SPECIFIC PASTRIES
+'''DISPLAYING AND ORDERING SPECIFIC PASTRIES'''
 def pastries_subcategory(root):
     clear()
+    profilenav(root)
     left_frame = Frame(root)
     left_frame.place(relx=0.325, rely=0.5, anchor=CENTER) 
 
@@ -622,7 +830,7 @@ def pastries_subcategory(root):
             quantity_entry.delete(0, END)
             return
 
-        db.insert_into_orders(item_name, price, quantity)
+        db.insert_into_orders(db.get_current_username(),item_name, price, quantity)
         messagebox.showinfo("Order Added", f"{item_name} has been added.")
         quantity_entry.delete(0, END)
 
@@ -673,6 +881,7 @@ def pastries_subcategory(root):
     checkout(root)
     disable_onload()
 
+
 # MAIN 
 if __name__ == "__main__":
     db = DB("KoppiProject.db")
@@ -686,8 +895,8 @@ if __name__ == "__main__":
         # db.delete_orders()
         homepage(root)
         # buy(root)
+        # checkouts(root)
     finally:
-        # db.delete_orders()
         pass
-
-    root.mainloop()
+        
+    root.mainloop() 
