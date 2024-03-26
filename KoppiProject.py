@@ -488,7 +488,7 @@ def checkouts(root):
 
                     clear()
                     content = db.receipt(total_due, selected_payment, 0)
-                    text_receipt = scrolledtext.ScrolledText(root, width=55, height=40, wrap=tk.WORD)
+                    text_receipt = scrolledtext.ScrolledText(root, width=55, height=35, wrap=tk.WORD)
                     text_receipt.pack(pady=20)
 
                     text_receipt.delete("1.0", END)
@@ -510,7 +510,7 @@ def checkouts(root):
 
                             clear()
                             content = db.receipt(cash_amount, selected_payment, change_due)
-                            text_receipt = scrolledtext.ScrolledText(root, width=55, height=40, wrap=tk.WORD)
+                            text_receipt = scrolledtext.ScrolledText(root, width=55, height=35, wrap=tk.WORD)
                             text_receipt.pack(pady=20)
 
                             text_receipt.delete("1.0", END)
