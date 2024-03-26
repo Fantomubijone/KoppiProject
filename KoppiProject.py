@@ -446,10 +446,10 @@ def checkouts(root):
         frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         # Header
-        header_label = tk.Label(frame, text="ORDER SUMMARY", font=("Helvetica", 40, "bold"))
-        header_label.pack(pady=(10, 20))
+        header_label = tk.Label(frame, text="ORDER SUMMARY", font=("Helvetica", 25, "bold"))
+        header_label.pack(pady=(15, 20))
 
-        tree = ttk.Treeview(frame, height=18)
+        tree = ttk.Treeview(frame, height=15)
         tree['columns'] = ('Item Name', 'Price', 'Quantity')
 
         # Column headings
