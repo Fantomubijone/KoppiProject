@@ -342,14 +342,14 @@ def editprofile(root):
     username_label.grid(row=8, column=0, sticky="w", padx=20)
     username_entry = ctk.CTkEntry(edit_frame) 
     username_entry.grid(row=8, column=1, sticky="w", padx=(0, 20))
-    username_entry.insert(0, user_details[0])  # Assuming username is at index 0
+    username_entry.insert(0, user_details[0])  # Username is at index 0
 
     # Password
     password_label = tk.Label(edit_frame, text="Password:", font=("Segoe UI", 10))
     password_label.grid(row=9, column=0, sticky="w", padx=20)
     password_entry = ctk.CTkEntry(edit_frame, show="*")  
     password_entry.grid(row=9, column=1, sticky="w", padx=(0, 20))
-    password_entry.insert(0, user_details[5])  # Assuming password is at index 5
+    password_entry.insert(0, user_details[5])  # Password is at index 5
 
     first_name_entry.configure(state='disabled')
     last_name_entry.configure(state='disabled')
@@ -1001,13 +1001,6 @@ if __name__ == "__main__":
     set_default_color_theme("green")
     root.title("Ordering System")
     center_window(root)
+    homepage(root)
 
-    try:
-        # db.delete_orders()
-        homepage(root)
-        # buy(root)
-        # checkouts(root)
-    finally:
-        pass
-        
     root.mainloop() 
