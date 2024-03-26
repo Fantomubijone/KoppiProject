@@ -488,7 +488,7 @@ def checkouts(root):
 
                     clear()
                     content = db.receipt(total_due, selected_payment, 0)
-                    text_receipt = scrolledtext.ScrolledText(root, width=55, height=45, wrap=tk.WORD)
+                    text_receipt = scrolledtext.ScrolledText(root, width=55, height=40, wrap=tk.WORD)
                     text_receipt.pack(pady=20)
 
                     text_receipt.delete("1.0", END)
@@ -496,7 +496,7 @@ def checkouts(root):
 
                     create_button(root, 'Save Receipt', lambda: save_receipt(content))
                     create_button(root, 'Order Again', lambda: order_again(current_username))
-                    create_button(root, 'Logout', confirm_logout)
+                    create_button(root, 'Logout', lambda: confirm_logout(root))
                     db.delete_orders_by_username(current_username)
 
                 elif selected_payment == "CASH":
@@ -510,7 +510,7 @@ def checkouts(root):
 
                             clear()
                             content = db.receipt(cash_amount, selected_payment, change_due)
-                            text_receipt = scrolledtext.ScrolledText(root, width=55, height=45, wrap=tk.WORD)
+                            text_receipt = scrolledtext.ScrolledText(root, width=55, height=40, wrap=tk.WORD)
                             text_receipt.pack(pady=20)
 
                             text_receipt.delete("1.0", END)
@@ -518,7 +518,7 @@ def checkouts(root):
 
                             create_button(root, 'Save Receipt', lambda: save_receipt(content))
                             create_button(root, 'Order Again', lambda: order_again(current_username))
-                            create_button(root, 'Logout', confirm_logout)
+                            create_button(root, 'Logout', lambda: confirm_logout(root))
                             db.delete_orders_by_username(current_username)
                         else:
                             messagebox.showerror("Insufficient Cash", "Cash amount is less than total due.")
