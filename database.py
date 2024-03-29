@@ -1,13 +1,15 @@
-import sqlite3
-import random
-import os
-from datetime import datetime
+import sqlite3 # database
+import random # for the receipt ref num
+import os # for detecting existing txt file
+from datetime import datetime # for the date today
 
 class DB:
 
     def __init__(self, db_name):
         self.conn = sqlite3.connect(db_name)
         self.c = self.conn.cursor()
+
+        # Preloading tables
         self.create_accounts_table()
         self.create_menu_tables()  
         self.create_orders_table()
